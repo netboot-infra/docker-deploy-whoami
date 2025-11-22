@@ -1,5 +1,5 @@
 networks:
-  traefik_public:
+  home_net:
     external: true
 
 services:
