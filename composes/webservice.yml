@@ -1,0 +1,17 @@
+webservice:
+  image: traefik/whoami:v1.11
+  networks:
+    - home_net
+  deploy:
+    replicas: 1
+    labels:
+      - "sablier.enable=true"
+      - "sablier.group=whoami"
+      - "traefik.enable=true"
+      - "traefik.swarm.lbswarm=true"
+      - "traefik.http.routers.whoami.rule=Host(`whoami.netboot.fr`)"
+      - "traefik.http.routers.whoami.entrypoints=https"
+      - "traefik.http.services.whoami.loadbalancer.server.port=80"
+      - "traefik.http.middlewares.sablier-whoami.plugin.sablier.group=whoami"
+      - "traefik.http.middlewares.sablier-whoami.plugin.sablier.dynamic.displayName=Whoami"
+      - "traefik.http.middlewares.sablier-whoami.plugin.sablier.sessionDuration=15s"

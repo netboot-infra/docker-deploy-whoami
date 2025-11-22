@@ -1,0 +1,5 @@
+networks:
+  traefik_public:
+    external: true
+
+services:
