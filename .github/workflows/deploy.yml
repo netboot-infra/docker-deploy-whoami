@@ -10,6 +10,9 @@ jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        
       - name: Configure SSH for remote Docker host
         env:
           SSH_CONFIG: |
@@ -38,4 +41,4 @@ jobs:
         env:
           DOCKER_HOST: "ssh://${{ vars.REMOTE_DOCKER_HOST }}:${{ vars.REMOTE_DOCKER_SSH_PORT }}"
         run: |
-          sed 's/^/  /' composes/* | cat docker-compose.yml - | docker stack deploy --compose-file - ${{ github.repository }}
+          sed 's/^/  /' composes/* | cat docker-compose.yml - | docker stack deploy --compose-file - ${{ github.event.repository.name}}
