@@ -1,19 +1,21 @@
-name: Deploy
+name: Docker Stack Management
 
-on:
-  push:
-    branches: [ main ]
-  pull_request:
-    branches: [ main ]
+on: 
   workflow_dispatch:
-  
+    inputs:
+      action:
+        type: choice
+        description: Select the Docker stack operation you want to execute on the remote host
+        options: 
+          - ls       # List all deployed stacks
+          - ps       # Show running services for the stack
+          - rm       # Remove the stack
+          - services # List services in the stack
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
-        
       - name: Configure SSH for remote Docker host
         env:
           SSH_CONFIG: |
@@ -32,14 +34,13 @@ jobs:
           echo "\${SSH_KNOWN_HOSTS}" | envsubst | envsubst > ~/.ssh/known_hosts
           echo "${REMOTE_DOCKER_SSH_PRIVATE_KEY}" | base64 -d > ~/.ssh/docker.key
           chmod 600 ~/.ssh/docker.key
-
+  
       - name: Test connection to remote Docker host
         env:
           DOCKER_HOST: "ssh://${{ vars.REMOTE_DOCKER_HOST }}:${{ vars.REMOTE_DOCKER_SSH_PORT }}"
         run: docker version
 
-      - name: Deploy stack to remote Docker host
+      - name: Execute Docker stack action
         env:
           DOCKER_HOST: "ssh://${{ vars.REMOTE_DOCKER_HOST }}:${{ vars.REMOTE_DOCKER_SSH_PORT }}"
-        run: |
-          sed 's/^/  /' composes/* | cat docker-compose.yml - | docker stack deploy --compose-file - ${{ github.event.repository.name}}
+        run: docker stack ${{ github.event.inputs.action }} ${{ github.event.repository.name}}
