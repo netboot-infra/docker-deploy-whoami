@@ -13,7 +13,7 @@ on:
           - services # List services in the stack
 
 jobs:
-  deploy:
+  execute-action:
     runs-on: ubuntu-latest
     steps:
       - name: Configure SSH for remote Docker host
